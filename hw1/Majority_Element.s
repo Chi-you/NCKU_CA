@@ -1,5 +1,5 @@
 .data
-arr: .word 1, 2, 2, 5, 4, 2, 2, 1, 2, 2
+arr: .word 1, 2, 2, 5, 2, 2, 4, 1, 2, 2
 len: .word 10
 str: .string "The majority element is "
 
@@ -10,41 +10,42 @@ main:
     j print
 
 majorityElement:
-    li t4, 1               # t4: i
-    la t3, len
-    lw t3, 0(t3)           # t3: len
-    la t2, arr             # t2: arr base_addr
-    li t5, 1               # cnt = 1
-    lw t6, 0(t2)           # major = num[0]
+    la t0, len
+    lw t0, 0(t0)           # t0: len
+    la t1, arr             # t1: base_addr of arr
+    li t2, 1               # cnt = 1
+    li t3, 1               # i = 1
+    lw t4, 0(t1)           # major = num[0]
+    addi t1, t1, 4         # base_addr += 4 (Because array start from index 1)
 for:
-    blt t4, t3, loop       # if i < n, branch to label "loop"
-    jr ra
+    blt t3, t0, loop       # if i < len, branch to label "loop"
+    mv a0, t4
+    jr ra                  # return main 
 
 loop:
-    lw s5, 0(t2)
-    beq s5, t6, if         # if(num[i] == major)
-    beq t5, zero, elseif   # else if(cnt == 0)
-    addi t5, t5, -1        # cnt--
+    lw t5, 0(t1)           # t5 = num[i]
+    beq t5, t4, if         # if(num[i] == major)
+    beq t2, zero, elseif   # else if(cnt == 0)
+    addi t2, t2, -1        # cnt--
 increment:
-    addi t2, t2, 4         # base_addr += 4
-    addi t4, t4, 1         # i++
+    addi t1, t1, 4         # base_addr += 4
+    addi t3, t3, 1         # i++
     j for
 
 if:
-    addi t5, t5, 1         # cnt++
+    addi t2, t2, 1         # cnt++
     j increment
 
 elseif:
-    addi t6, s5, 0         # major = num[i];
-    addi t5, t5, 1         # cnt++
+    mv t4, t5              # major = num[i];
+    addi t2, t2, 1         # cnt++
     j increment
 
-# ---- print ----
 print:
     la a0, str
     li a7,4                # print string
     ecall 
-    mv a0, t6
+    mv a0, t4
     li a7, 1               # print integer
     ecall
 exit:
