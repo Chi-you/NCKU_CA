@@ -7,7 +7,16 @@ str: .string "The majority element is "
 
 main:
     jal ra, majorityElement
-    j print
+print:
+    la a0, str
+    li a7,4                # print string
+    ecall 
+    mv a0, t4
+    li a7, 1               # print integer
+    ecall
+exit:
+    li a7, 10              # exit
+    ecall
 
 majorityElement:
     la t0, len
@@ -41,13 +50,4 @@ elseif:
     addi t2, t2, 1         # cnt++
     j increment
 
-print:
-    la a0, str
-    li a7,4                # print string
-    ecall 
-    mv a0, t4
-    li a7, 1               # print integer
-    ecall
-exit:
-    li a7, 10              # exit
-    ecall
+
